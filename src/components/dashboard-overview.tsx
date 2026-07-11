@@ -3,7 +3,7 @@ import {
   AlertTriangle,
   ArrowDownRight,
   ArrowUpRight,
-  BadgeCheck,
+  BarChart3,
   Banknote,
   Bell,
   Calendar as CalendarIcon,
