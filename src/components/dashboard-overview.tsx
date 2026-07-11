@@ -648,6 +648,3 @@ export function DashboardOverview() {
     </div>
   );
 }
-
-// keep single icon import used
-const BarChart3 = TrendingUp;
