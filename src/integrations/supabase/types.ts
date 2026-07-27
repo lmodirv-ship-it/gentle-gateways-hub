@@ -14,6 +14,156 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_insights: {
+        Row: {
+          body: string | null
+          dismissed_at: string | null
+          generated_at: string
+          id: string
+          kind: string
+          metric: Json
+          severity: Database["public"]["Enums"]["insight_severity"]
+          site_id: string
+          title: string
+        }
+        Insert: {
+          body?: string | null
+          dismissed_at?: string | null
+          generated_at?: string
+          id?: string
+          kind?: string
+          metric?: Json
+          severity?: Database["public"]["Enums"]["insight_severity"]
+          site_id: string
+          title: string
+        }
+        Update: {
+          body?: string | null
+          dismissed_at?: string | null
+          generated_at?: string
+          id?: string
+          kind?: string
+          metric?: Json
+          severity?: Database["public"]["Enums"]["insight_severity"]
+          site_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          expires_at: string | null
+          id: string
+          site_id: string
+          updated_at: string
+          usage_limit: number | null
+          used_count: number
+          value: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_type?: string
+          expires_at?: string | null
+          id?: string
+          site_id: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+          value?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_type?: string
+          expires_at?: string | null
+          id?: string
+          site_id?: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupons_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          avatar_url: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          first_seen_at: string
+          id: string
+          last_purchase_at: string | null
+          lifetime_value: number
+          name: string
+          phone: string | null
+          site_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          first_seen_at?: string
+          id?: string
+          last_purchase_at?: string | null
+          lifetime_value?: number
+          name: string
+          phone?: string | null
+          site_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          first_seen_at?: string
+          id?: string
+          last_purchase_at?: string | null
+          lifetime_value?: number
+          name?: string
+          phone?: string | null
+          site_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fx_rates: {
         Row: {
           base_currency: string
@@ -40,6 +190,86 @@ export type Database = {
           target_currency?: string
         }
         Relationships: []
+      }
+      invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          customer_id: string | null
+          due_at: string | null
+          id: string
+          number: string
+          order_id: string | null
+          paid_at: string | null
+          pdf_url: string | null
+          site_id: string
+          status: Database["public"]["Enums"]["invoice_status"]
+          subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          due_at?: string | null
+          id?: string
+          number?: string
+          order_id?: string | null
+          paid_at?: string | null
+          pdf_url?: string | null
+          site_id: string
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          due_at?: string | null
+          id?: string
+          number?: string
+          order_id?: string | null
+          paid_at?: string | null
+          pdf_url?: string | null
+          site_id?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lovable_spend: {
         Row: {
@@ -76,6 +306,158 @@ export type Database = {
           year?: number
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read_at: string | null
+          site_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          site_id?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          site_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          order_id: string
+          product_id: string | null
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          order_id: string
+          product_id?: string | null
+          quantity?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          order_id?: string
+          product_id?: string | null
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          customer_id: string | null
+          id: string
+          payment_method: string | null
+          placed_at: string
+          provider: string | null
+          provider_ref: string | null
+          reference: string
+          site_id: string
+          status: Database["public"]["Enums"]["order_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          id?: string
+          payment_method?: string | null
+          placed_at?: string
+          provider?: string | null
+          provider_ref?: string | null
+          reference?: string
+          site_id: string
+          status?: Database["public"]["Enums"]["order_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          id?: string
+          payment_method?: string | null
+          placed_at?: string
+          provider?: string | null
+          provider_ref?: string | null
+          reference?: string
+          site_id?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_connections: {
         Row: {
@@ -124,6 +506,100 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          active: boolean
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          site_id: string
+          sku: string | null
+          stock: number | null
+          type: Database["public"]["Enums"]["product_type"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price?: number
+          site_id: string
+          sku?: string | null
+          stock?: number | null
+          type?: Database["public"]["Enums"]["product_type"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          site_id?: string
+          sku?: string | null
+          stock?: number | null
+          type?: Database["public"]["Enums"]["product_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          active_site_id: string | null
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          locale: string
+          updated_at: string
+        }
+        Insert: {
+          active_site_id?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          locale?: string
+          updated_at?: string
+        }
+        Update: {
+          active_site_id?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          locale?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_active_site_id_fkey"
+            columns: ["active_site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       revenue_snapshots: {
         Row: {
           created_at: string | null
@@ -131,10 +607,12 @@ export type Database = {
           gross: number | null
           id: string
           net: number | null
+          orders_count: number
           refunds: number | null
           site_id: string
           snapshot_date: string
           updated_at: string | null
+          visitors: number
         }
         Insert: {
           created_at?: string | null
@@ -142,10 +620,12 @@ export type Database = {
           gross?: number | null
           id?: string
           net?: number | null
+          orders_count?: number
           refunds?: number | null
           site_id: string
           snapshot_date: string
           updated_at?: string | null
+          visitors?: number
         }
         Update: {
           created_at?: string | null
@@ -153,10 +633,12 @@ export type Database = {
           gross?: number | null
           id?: string
           net?: number | null
+          orders_count?: number
           refunds?: number | null
           site_id?: string
           snapshot_date?: string
           updated_at?: string | null
+          visitors?: number
         }
         Relationships: [
           {
@@ -174,7 +656,10 @@ export type Database = {
           currency: string | null
           domain: string
           id: string
+          logo_url: string | null
           name: string
+          plan: string
+          plan_expires_at: string | null
           provider: string | null
           status: string | null
           updated_at: string | null
@@ -185,7 +670,10 @@ export type Database = {
           currency?: string | null
           domain: string
           id?: string
+          logo_url?: string | null
           name: string
+          plan?: string
+          plan_expires_at?: string | null
           provider?: string | null
           status?: string | null
           updated_at?: string | null
@@ -196,13 +684,172 @@ export type Database = {
           currency?: string | null
           domain?: string
           id?: string
+          logo_url?: string | null
           name?: string
+          plan?: string
+          plan_expires_at?: string | null
           provider?: string | null
           status?: string | null
           updated_at?: string | null
           user_id?: string
         }
         Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          billing_interval: string
+          canceled_at: string | null
+          created_at: string
+          currency: string
+          current_period_end: string | null
+          customer_id: string | null
+          id: string
+          plan_name: string
+          product_id: string | null
+          renewal_price: number
+          site_id: string
+          started_at: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          updated_at: string
+        }
+        Insert: {
+          billing_interval?: string
+          canceled_at?: string | null
+          created_at?: string
+          currency?: string
+          current_period_end?: string | null
+          customer_id?: string | null
+          id?: string
+          plan_name: string
+          product_id?: string | null
+          renewal_price?: number
+          site_id: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+        }
+        Update: {
+          billing_interval?: string
+          canceled_at?: string | null
+          created_at?: string
+          currency?: string
+          current_period_end?: string | null
+          customer_id?: string | null
+          id?: string
+          plan_name?: string
+          product_id?: string | null
+          renewal_price?: number
+          site_id?: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          id: string
+          last_message_at: string
+          priority: string
+          site_id: string
+          status: Database["public"]["Enums"]["ticket_status"]
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          last_message_at?: string
+          priority?: string
+          site_id: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          last_message_at?: string
+          priority?: string
+          site_id?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_messages: {
+        Row: {
+          author: string
+          body: string
+          created_at: string
+          id: string
+          ticket_id: string
+        }
+        Insert: {
+          author?: string
+          body: string
+          created_at?: string
+          id?: string
+          ticket_id: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          created_at?: string
+          id?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -225,9 +872,128 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          reference: string | null
+          site_id: string
+          type: Database["public"]["Enums"]["wallet_tx_type"]
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          reference?: string | null
+          site_id: string
+          type: Database["public"]["Enums"]["wallet_tx_type"]
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          reference?: string | null
+          site_id?: string
+          type?: Database["public"]["Enums"]["wallet_tx_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      v_daily_revenue: {
+        Row: {
+          day: string | null
+          orders_count: number | null
+          revenue: number | null
+          site_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_monthly_revenue: {
+        Row: {
+          month: string | null
+          orders_count: number | null
+          revenue: number | null
+          site_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_payment_split: {
+        Row: {
+          method: string | null
+          site_id: string | null
+          total: number | null
+          tx_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_top_products: {
+        Row: {
+          name: string | null
+          product_id: string | null
+          revenue: number | null
+          site_id: string | null
+          units: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {
@@ -237,9 +1003,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      owns_site: { Args: { _site_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
+      insight_severity: "info" | "warning" | "critical" | "success"
+      invoice_status: "draft" | "open" | "paid" | "void" | "overdue"
+      order_status: "paid" | "pending" | "failed" | "refunded" | "canceled"
+      product_type: "plan" | "service" | "template" | "physical" | "digital"
+      subscription_status:
+        | "active"
+        | "trialing"
+        | "past_due"
+        | "canceled"
+        | "expired"
+      ticket_status: "open" | "pending" | "resolved" | "closed"
+      wallet_tx_type: "credit" | "debit" | "payout" | "refund" | "fee"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -368,6 +1147,19 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      insight_severity: ["info", "warning", "critical", "success"],
+      invoice_status: ["draft", "open", "paid", "void", "overdue"],
+      order_status: ["paid", "pending", "failed", "refunded", "canceled"],
+      product_type: ["plan", "service", "template", "physical", "digital"],
+      subscription_status: [
+        "active",
+        "trialing",
+        "past_due",
+        "canceled",
+        "expired",
+      ],
+      ticket_status: ["open", "pending", "resolved", "closed"],
+      wallet_tx_type: ["credit", "debit", "payout", "refund", "fee"],
     },
   },
 } as const
