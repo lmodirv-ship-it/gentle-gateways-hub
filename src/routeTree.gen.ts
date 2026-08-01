@@ -17,7 +17,9 @@ import { Route as AuthenticatedSubscriptionsRouteImport } from './routes/_authen
 import { Route as AuthenticatedSitesRouteImport } from './routes/_authenticated/sites'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
+import { Route as AuthenticatedHnAiRouteImport } from './routes/_authenticated/hn-ai'
 import { Route as AuthenticatedCouponsRouteImport } from './routes/_authenticated/coupons'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
@@ -67,9 +69,20 @@ const AuthenticatedPaymentsRoute = AuthenticatedPaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInvoicesRoute = AuthenticatedInvoicesRouteImport.update({
   id: '/invoices',
   path: '/invoices',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHnAiRoute = AuthenticatedHnAiRouteImport.update({
+  id: '/hn-ai',
+  path: '/hn-ai',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCouponsRoute = AuthenticatedCouponsRouteImport.update({
@@ -122,7 +135,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/coupons': typeof AuthenticatedCouponsRoute
+  '/hn-ai': typeof AuthenticatedHnAiRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/payments': typeof AuthenticatedPaymentsRoute
   '/products': typeof AuthenticatedProductsRoute
   '/sites': typeof AuthenticatedSitesRoute
@@ -139,7 +154,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/coupons': typeof AuthenticatedCouponsRoute
+  '/hn-ai': typeof AuthenticatedHnAiRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/payments': typeof AuthenticatedPaymentsRoute
   '/products': typeof AuthenticatedProductsRoute
   '/sites': typeof AuthenticatedSitesRoute
@@ -159,7 +176,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/coupons': typeof AuthenticatedCouponsRoute
+  '/_authenticated/hn-ai': typeof AuthenticatedHnAiRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/sites': typeof AuthenticatedSitesRoute
@@ -180,7 +199,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/analytics'
     | '/coupons'
+    | '/hn-ai'
     | '/invoices'
+    | '/notifications'
     | '/payments'
     | '/products'
     | '/sites'
@@ -197,7 +218,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/analytics'
     | '/coupons'
+    | '/hn-ai'
     | '/invoices'
+    | '/notifications'
     | '/payments'
     | '/products'
     | '/sites'
@@ -216,7 +239,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/analytics'
     | '/_authenticated/coupons'
+    | '/_authenticated/hn-ai'
     | '/_authenticated/invoices'
+    | '/_authenticated/notifications'
     | '/_authenticated/payments'
     | '/_authenticated/products'
     | '/_authenticated/sites'
@@ -294,11 +319,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPaymentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/invoices': {
       id: '/_authenticated/invoices'
       path: '/invoices'
       fullPath: '/invoices'
       preLoaderRoute: typeof AuthenticatedInvoicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/hn-ai': {
+      id: '/_authenticated/hn-ai'
+      path: '/hn-ai'
+      fullPath: '/hn-ai'
+      preLoaderRoute: typeof AuthenticatedHnAiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/coupons': {
@@ -363,7 +402,9 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedCouponsRoute: typeof AuthenticatedCouponsRoute
+  AuthenticatedHnAiRoute: typeof AuthenticatedHnAiRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedSitesRoute: typeof AuthenticatedSitesRoute
@@ -381,7 +422,9 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedCouponsRoute: AuthenticatedCouponsRoute,
+  AuthenticatedHnAiRoute: AuthenticatedHnAiRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPaymentsRoute: AuthenticatedPaymentsRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedSitesRoute: AuthenticatedSitesRoute,
