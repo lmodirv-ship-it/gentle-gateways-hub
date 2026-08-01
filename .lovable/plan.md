@@ -1,130 +1,48 @@
+# خطة: قاعدة بيانات محلية + ربط الإعدادات وكل الصفحات + حزمة ZIP للتجربة على حاسوبك
 
-# خطة تطوير HN Groupe Dashboard
+## الهدف
+تشغيل المنصة كاملة على حاسوبك بقاعدة بيانات محلية (بدون الحاجة للسحابة)، مع صفحة إعدادات تدير الاتصال والبيانات، وربط جميع صفحات الشريط الجانبي ببيانات حقيقية، ثم تسليم ملف ZIP + دليل بناء وتشغيل.
 
-## الوضع الحالي (ملخص الفحص)
-
-**الموجود:**
-- مسار وحيد `/` يعرض لوحة تحكم كاملة ببيانات وهمية (Mock).
-- Sidebar فيه 15 رابطًا (sites, analytics, orders, products, customers, subscriptions, payments, invoices, coupons, wallet, hn-ai, notifications, support, settings) — **كلها روابط ميتة** بلا ملفات routes.
-- جداول DB: `sites`, `payment_connections`, `revenue_snapshots`, `fx_rates`, `lovable_spend`, `user_roles` مع RLS جاهز.
-- Lovable Cloud + Supabase موصولان، لكن **لا يوجد نظام تسجيل دخول** ولا صفحة `/auth`، ولا layout محمي `_authenticated/`.
-- ستايل زجاجي أزرق مطبّق.
-
-**الفجوات الحرجة:**
-1. لا Auth → لا يمكن استخدام RLS ولا حماية أي شيء.
-2. لا جداول لـ: profiles, customers, products, orders, order_items, subscriptions, invoices, coupons, wallet_transactions, support_tickets, notifications, ai_insights.
-3. كل الأرقام في الواجهة مزيفة.
-4. لا تكامل حقيقي مع أي مزوّد دفع رغم وجود جدول `payment_connections`.
-
----
+## الوضع الحالي (تم التحقق)
+- المسارات الموجودة فعليًا: `__root.tsx`, `auth.tsx`, `_authenticated/route.tsx`, `_authenticated/index.tsx` فقط. باقي روابط الشريط الجانبي (orders, products, customers, subscriptions, payments, invoices, coupons, wallet, hn-ai, notifications, support, settings, sites, analytics) **لا تملك ملفات** — روابط ميتة.
+- الجداول موجودة في القاعدة السحابية مع RLS وGRANTs: profiles, sites, customers, products, orders, order_items, subscriptions, invoices, coupons, wallet_transactions, support_tickets, ticket_messages, notifications, ai_insights, revenue_snapshots, fx_rates, payment_connections, user_roles.
+- الاتصال حاليًا عبر متغيرات `.env` (VITE_SUPABASE_URL/KEY) — أي أن التبديل إلى قاعدة محلية ممكن بتغيير هذه المتغيرات فقط.
+- لا يوجد مجلد `supabase/migrations` قابل للتشغيل محليًا حتى الآن (فقط `config.toml`).
 
 ## المراحل
 
-### المرحلة 1 — الأساس: Auth + Multi-Site + الأدوار
-- إنشاء `src/routes/auth.tsx` (Email/Password + Google) عبر Lovable Cloud.
-- إنشاء layout محمي `src/routes/_authenticated/route.tsx` (managed).
-- نقل لوحة التحكم `/` إلى `_authenticated/index.tsx`.
-- جدول `profiles` (full_name, avatar_url, locale, active_site_id).
-- Trigger `on_auth_user_created` يزرع profile + role='user' + site افتراضي.
-- Site Switcher في الـHeader (بدل النص الثابت "hn-groupe.com") يعتمد على `sites` الحقيقي.
-- Context للـ `activeSite` عبر React Query + localStorage.
+### 1) قاعدة بيانات محلية قابلة للتشغيل
+- إنشاء `supabase/migrations/0001_init.sql` يحتوي **كامل** المخطط: الـenums، الجداول، الفهارس، الـGRANTs، سياسات RLS، الدوال (`has_role`, `owns_site`, `handle_new_user`, `update_updated_at_column`)، والمشاهدات التجميعية.
+- إنشاء `supabase/seed.sql` ببيانات تجريبية (مستخدم تجريبي + موقع + عملاء + منتجات + طلبات + اشتراكات + فواتير + كوبونات + محفظة + تذاكر + إشعارات + رؤى AI + سجلات إيرادات) حتى تظهر كل الصفحات ممتلئة دون سحابة.
+- إضافة `docker-compose.yml` (Supabase local عبر `supabase start`، وبديل Postgres مفرد لمن لا يريد Supabase CLI).
+- `.env.example` + `scripts/setup-local.sh` (تشغيل القاعدة، تطبيق الـmigration، تشغيل الـseed).
 
-### المرحلة 2 — نموذج البيانات التجاري
-Migrations متتالية (كل جدول: GRANTs + RLS scoped إلى `site_id → sites.user_id`):
-- `customers` (site_id, email, phone, name, avatar, lifetime_value, status, first_seen_at, last_purchase_at)
-- `products` (site_id, name, sku, type[plan|service|template|physical], price, currency, stock, active)
-- `orders` + `order_items` (status: paid/pending/failed/refunded, amount, currency, customer_id, provider_ref)
-- `subscriptions` (customer_id, product_id, status: active/expiring/canceled/expired, current_period_end, renewal_price)
-- `invoices` (order_id | subscription_id, number, status, due_at, paid_at, pdf_url)
-- `coupons` (code, discount_type, value, usage_limit, used_count, expires_at)
-- `wallet_transactions` (site_id, type: credit/debit/payout, amount, balance_after, reference)
-- `support_tickets` + `ticket_messages`
-- `notifications` (user_id, site_id, type, title, body, read_at)
-- `ai_insights` (site_id, kind, severity, title, body, generated_at, dismissed_at)
-- `product_reviews` (اختياري لعرض "المراجعات")
-- Views للتجميعات: `v_daily_revenue`, `v_monthly_revenue`, `v_top_products`, `v_payment_split`, `v_kpi_today`.
+### 2) صفحة الإعدادات كمركز تحكم
+`/settings` بتبويبات:
+- **الحساب**: الاسم، الصورة، اللغة (تحديث `profiles`).
+- **المواقع**: قائمة `sites`، إضافة/تعديل، اختيار الموقع النشط (`active_site_id`).
+- **قاعدة البيانات / الاتصال**: عرض حالة الاتصال الحالي، الوضع (محلي/سحابي)، اختبار الاتصال، عدّاد صفوف كل جدول، وأزرار "تشغيل بيانات تجريبية" و"تصفير بيانات الموقع" (عبر server functions محمية).
+- **المدفوعات**: إدارة `payment_connections` (المزوّد، الحالة، آخر مزامنة).
+- **الأمان**: تغيير كلمة المرور، الأدوار من `user_roles`.
 
-### المرحلة 3 — الصفحات + ربط البيانات الحقيقية
-كل مسار في الـSidebar يصبح route حقيقي تحت `_authenticated/`:
-- `sites`, `analytics`, `orders`, `orders.$id`, `products`, `products.$id`, `customers`, `customers.$id`, `subscriptions`, `payments`, `invoices`, `coupons`, `wallet`, `hn-ai`, `notifications`, `support`, `support.$ticketId`, `settings` (+ tabs: profile, team, billing, integrations, security).
-- استبدال كل Mock في `DashboardOverview` بـ `useSuspenseQuery` يستدعي `createServerFn` مع `requireSupabaseAuth`.
-- Server functions تحت `src/lib/dashboard.functions.ts`, `orders.functions.ts` … إلخ.
-- Skeletons + errorComponent + notFoundComponent لكل route.
-- Realtime على `orders`, `notifications`, `support_tickets` عبر Supabase channels.
+### 3) ربط جميع الصفحات
+إنشاء كل صفحة تحت `_authenticated/` مربوطة بجدولها عبر `createServerFn` + `requireSupabaseAuth` + فلترة على الموقع النشط:
+- `dashboard` (KPIs والرسوم من `revenue_snapshots` + `orders`)
+- `sites`, `analytics`
+- `orders` + `orders.$id` (مع `order_items`)
+- `products` + `products.$id`
+- `customers` + `customers.$id`
+- `subscriptions`, `invoices`, `coupons`, `wallet`, `payments`
+- `support` + `support.$id` (مع `ticket_messages`)
+- `notifications`, `hn-ai` (من `ai_insights`)
+- لكل صفحة: جدول/بطاقات + بحث + فرز + ترقيم + حالات فراغ + Skeleton + `errorComponent`.
 
-### المرحلة 4 — مزوّدات الدفع
-- شاشة `settings/integrations` لربط: Stripe + PayPal + HN-PAY (مخصص).
-- استعمال جدول `payment_connections` الموجود + Secrets عبر `add_secret`.
-- Server routes ويبهوك تحت `src/routes/api/public/webhooks/{stripe,paypal,hn-pay}.ts` مع تحقّق التوقيع و`supabaseAdmin`.
-- Cron (pg_cron) يومي: `revenue_snapshots` + تحديث `fx_rates`.
-- تحويل عملة موحّد باستخدام `fx_rates`.
-
-### المرحلة 5 — HN AI
-- Route `/hn-ai` + بطاقات AI في لوحة التحكم مربوطة بجدول `ai_insights`.
-- Server function `generateInsights` يستخدم Lovable AI Gateway (`LOVABLE_API_KEY`) على مقاييس آخر 30 يومًا:
-  - كشف انخفاض إيرادات > 10%.
-  - عملاء معرضون للـChurn (لا شراء منذ Xd + اشتراك ينتهي).
-  - أفضل خدمة/منتج.
-  - اقتراحات ترويج (كوبون، خصم سنوي).
-- Cron كل 6 ساعات ينفّذ التوليد ويكتب النتائج.
-- زر "Ask HN AI" في الـHeader (Chat drawer) يستخدم نفس Gateway مع Context خاص بالـsite النشط.
-
-### المرحلة 6 — تجهيز الإنتاج
-- Roles: admin/user + صفحات إدارية تحت `_authenticated/_admin/`.
-- Rate limiting + input validation (Zod) في كل server fn.
-- Empty states, i18n كامل RTL، Dark/Light toggle.
-- تشغيل `supabase--linter` + `security--run_security_scan` وإصلاح النتائج.
-- SEO: title/description لكل route + og:image ديناميكي للصفحات العامة (auth, marketing).
-- E2E سريع بـPlaywright على تدفقات: تسجيل → إنشاء site → عرض لوحة.
-- زر النشر.
-
----
+### 4) الحزمة والتوثيق
+- `README-LOCAL.md` بالعربية: المتطلبات (Node 20+/Bun، Docker، Supabase CLI)، خطوات التثبيت، تشغيل القاعدة، `bun install`, `bun run dev`, حساب الدخول التجريبي، وحل المشاكل الشائعة.
+- توليد ZIP يستبعد `node_modules/.git/dist` ووضعه في مجلد المستندات لتنزيله مباشرة.
 
 ## تفاصيل تقنية
-
-```text
-src/
-├── routes/
-│   ├── __root.tsx
-│   ├── index.tsx                 → redirect إلى /auth أو لوحة التحكم
-│   ├── auth.tsx                  (عام)
-│   ├── _authenticated/
-│   │   ├── route.tsx             (managed gate)
-│   │   ├── index.tsx             (Dashboard)
-│   │   ├── sites.tsx
-│   │   ├── analytics.tsx
-│   │   ├── orders.tsx / orders.$id.tsx
-│   │   ├── products.tsx / products.$id.tsx
-│   │   ├── customers.tsx / customers.$id.tsx
-│   │   ├── subscriptions.tsx
-│   │   ├── payments.tsx / invoices.tsx / coupons.tsx / wallet.tsx
-│   │   ├── hn-ai.tsx
-│   │   ├── notifications.tsx
-│   │   ├── support.tsx / support.$id.tsx
-│   │   ├── settings.tsx (+ settings.*.tsx tabs)
-│   │   └── _admin/…              (RBAC)
-│   └── api/public/webhooks/{stripe,paypal,hn-pay}.ts
-├── lib/
-│   ├── dashboard.functions.ts
-│   ├── orders.functions.ts
-│   ├── customers.functions.ts
-│   ├── ai.functions.ts
-│   └── site-context.tsx
-└── components/… (glass-panel utility مستمر)
-```
-
-- كل server fn = `.middleware([requireSupabaseAuth])` + Zod validator + فلترة صريحة على `site_id` النشط.
-- Charts تُغذّى من Views مجمّعة (أداء أعلى من الحساب في الواجهة).
-- Realtime فقط على الجداول التي تحتاج تحديث فوري.
-
----
-
-## ترتيب التنفيذ المقترح (فوري)
-
-1. المرحلة 1 كاملة (Auth + protected layout + نقل الداشبورد).
-2. المرحلة 2: migrations الأولى (customers, products, orders, subscriptions, invoices) + Views.
-3. المرحلة 3: ربط الـKPIs والـCharts في `DashboardOverview` ببيانات حقيقية + إنشاء صفحات Orders/Products/Customers فعلية.
-4. باقي الصفحات + Wallet + Coupons + Support + Notifications.
-5. المدفوعات ثم HN AI ثم النشر.
-
-هل أبدأ فورًا بالمرحلة 1؟
+- ملف واحد للـmigration يعمل على Postgres 15+ داخل Supabase local؛ الأجزاء المرتبطة بـ`auth.users` تبقى كما هي لأن Supabase local يوفّر schema الـauth.
+- كل استعلامات الصفحات في `src/lib/*.functions.ts` مع Zod validation، بلا استخدام مفتاح الخدمة في الواجهة.
+- الوضع "محلي" مجرد تبديل `.env` — لا تغيير في الكود.
+- البيانات التجريبية تُدرج عبر SQL في الـseed، لا عبر الواجهة.
