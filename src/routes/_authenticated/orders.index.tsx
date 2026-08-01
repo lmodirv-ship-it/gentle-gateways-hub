@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { money, dateTime } from "@/lib/format";
 import { ArrowLeft } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/orders")({
+export const Route = createFileRoute("/_authenticated/orders/")({
   head: () => ({
     meta: [
       { title: "الطلبات — HN Groupe" },
