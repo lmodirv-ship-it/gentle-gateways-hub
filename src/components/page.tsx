@@ -1,21 +1,44 @@
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { statusText, tone } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+export function BackButton({ to = "/" }: { to?: string }) {
+  return (
+    <Button variant="outline" size="sm" asChild className="gap-1">
+      <Link to={to}>
+        <ArrowRight className="h-4 w-4" />
+        رجوع للرئيسية
+      </Link>
+    </Button>
+  );
+}
+
 export function PageHeader({
   title,
   description,
   action,
+  back = true,
+  backTo = "/",
 }: {
   title: string;
   description?: string;
   action?: ReactNode;
+  back?: boolean;
+  backTo?: string;
 }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3 border-b pb-4">
       <div>
+        {back && (
+          <div className="mb-2">
+            <BackButton to={backTo} />
+          </div>
+        )}
         <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h1>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
@@ -23,6 +46,7 @@ export function PageHeader({
     </div>
   );
 }
+
 
 export function Page({ children }: { children: ReactNode }) {
   return <div className="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6">{children}</div>;
