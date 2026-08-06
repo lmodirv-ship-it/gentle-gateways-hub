@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const main = [
-  { title: "لوحة التحكم", url: "/", icon: LayoutDashboard },
+  { title: "لوحة التحكم", url: "/dashboard", icon: LayoutDashboard },
   { title: "المواقع", url: "/sites", icon: Globe },
   { title: "التحليلات", url: "/analytics", icon: BarChart3 },
 ];
