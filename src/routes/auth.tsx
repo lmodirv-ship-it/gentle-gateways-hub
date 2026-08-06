@@ -35,7 +35,7 @@ function AuthPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) return toast.error("تعذّر تسجيل الدخول", { description: error.message });
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/dashboard", replace: true });
   };
 
   const signUp = async (e: React.FormEvent) => {
