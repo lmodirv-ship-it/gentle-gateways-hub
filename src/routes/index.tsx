@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { LandingForms } from "@/components/landing-forms";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -113,9 +114,14 @@ function LandingPage() {
             </div>
             <span className="text-lg font-bold">HN Groupe</span>
           </div>
-          <Button asChild variant="outline">
-            <Link to="/auth">تسجيل الدخول</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+              <a href="#forms">تواصل معنا</a>
+            </Button>
+            <Button asChild>
+              <Link to="/auth">تسجيل الدخول</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -139,7 +145,7 @@ function LandingPage() {
               <Link to="/auth">ابدأ الآن</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link to="/auth">تسجيل الدخول</Link>
+              <a href="#forms">احجز موعدًا</a>
             </Button>
           </div>
         </div>
@@ -218,6 +224,9 @@ function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Forms: appointment + contact */}
+      <LandingForms />
 
       {/* CTA */}
       <section className="px-4 py-20">
