@@ -145,7 +145,7 @@ function LandingPage() {
               <Link to="/auth">ابدأ الآن</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link to="/auth">تسجيل الدخول</Link>
+              <a href="#forms">احجز موعدًا</a>
             </Button>
           </div>
         </div>
@@ -224,6 +224,9 @@ function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Forms: appointment + contact */}
+      <LandingForms />
 
       {/* CTA */}
       <section className="px-4 py-20">
